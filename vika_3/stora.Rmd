@@ -1,0 +1,17 @@
+---
+title: "Fyrra R verkefni"
+author: "Þorvaldur Tumi Baldursson"
+date: "2023-02-01"
+output: html_document
+---
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+asdf <- qnorm(0.2)
+print(asdf)
+```
+
+```{r}
+test <- c(1,2,3,4,5)
+test
+```
