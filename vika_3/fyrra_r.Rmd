@@ -1,0 +1,64 @@
+---
+title: "Fyrra R verkefni"
+author: "Þorvaldur Tumi Baldursson (ttb3@hi.is)"
+date: "2023-02-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 9999)
+library(dplyr)
+```
+
+# Hluti 1 - Gagnameðhöndlun
+
+## byrjum á að lesa inn gögnin:
+```{r}
+housing_data <- read.table(
+    "https://notendur.hi.is/~ahj/husnaedisverd_2017_21.csv",
+    sep = ";",
+    header = TRUE,
+    stringsAsFactors = TRUE,
+)
+```
+## veljum síðan þrjú hverfi
+- mela / haga
+- breiðholt
+- austur kópavog
+```{r}
+hverfi <- c(8, 25, 320)
+housing_data <- dplyr::filter(housing_data, matssvaedi %in% hverfi)
+```
+
+## athugum gerð breyta
+```{r}
+print(str(housing_data))
+```
+týpur breytanna lýta út fyrir að vera réttar
+
+## búum til fermetra breytu
+```{r}
+housing_data <- housing_data %>% mutate(fermetraverd = kaupverd / birtm2)
+```
+
+## tegund eigna
+```{r}
+housing_data <- housing_data %>% mutate(teg_ein_s_i = case_when(
+    teg_eign %in% c("Einbýlishús", "Parhús", "Raðhús") ~ "Sérbýli",
+    teg_eign %in% c("Íbúðareign") ~ "Íbúð"
+))
+```
+
+## hverfi
+skiptum nú hverfakóðunum út fyrir nöfn þeirra á skiljanlegu máli, 
+það sem kóðinn gerir er að skipta hverjum 
+```{r}
+housing_data <- housing_data %>% transmute(housing_data,
+    matssvaedi = case_when(
+        matssvaedi == 8 ~ "Hagar / Melar",
+        matssvaedi == 25 ~ "Bakkar",
+        matssvaedi == 320 ~ "Kópavogur Au."
+    )
+)
+```

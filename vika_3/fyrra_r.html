@@ -363,10 +363,62 @@ pre code {
 </div>
 
 
-<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)</code></pre>
-<pre class="r"><code>test &lt;- c(1, 2, 3, 4, 5)
-print(test)</code></pre>
-<pre><code>## [1] 1 2 3 4 5</code></pre>
+<div id="hluti-1---gagnameðhöndlun" class="section level1">
+<h1>Hluti 1 - Gagnameðhöndlun</h1>
+<div id="byrjum-á-að-lesa-inn-gögnin" class="section level2">
+<h2>byrjum á að lesa inn gögnin:</h2>
+<pre class="r"><code>housing_data &lt;- read.table(
+    &quot;https://notendur.hi.is/~ahj/husnaedisverd_2017_21.csv&quot;,
+    sep = &quot;;&quot;,
+    header = TRUE,
+    stringsAsFactors = TRUE,
+)</code></pre>
+</div>
+<div id="veljum-síðan-þrjú-hverfi" class="section level2">
+<h2>veljum síðan þrjú hverfi</h2>
+<ul>
+<li>mela / haga</li>
+<li>breiðholt</li>
+<li>austur kópavog</li>
+</ul>
+<pre class="r"><code>hverfi &lt;- c(8, 25, 320)
+housing_data &lt;- dplyr::filter(housing_data, matssvaedi %in% hverfi)</code></pre>
+</div>
+<div id="athugum-gerð-breyta" class="section level2">
+<h2>athugum gerð breyta</h2>
+<pre class="r"><code>print(str(housing_data))</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1722 obs. of  5 variables:
+##  $ kaupverd  : int  18000 13500 51500 63800 18000 50000 32000 36000 29500 110000 ...
+##  $ teg_eign  : Factor w/ 4 levels &quot;Einbýlishús&quot;,..: 2 2 2 1 2 1 2 1 2 1 ...
+##  $ byggar    : int  1973 1971 1995 1924 1989 1962 2007 1955 1997 1941 ...
+##  $ birtm2    : num  89.5 49.9 216.4 243.1 65.6 ...
+##  $ matssvaedi: int  320 320 320 25 25 320 320 320 320 25 ...
+## NULL</code></pre>
+<p>týpur breytanna lýta út fyrir að vera réttar</p>
+</div>
+<div id="búum-til-fermetra-breytu" class="section level2">
+<h2>búum til fermetra breytu</h2>
+<pre class="r"><code>housing_data &lt;- housing_data %&gt;% mutate(fermetraverd = kaupverd / birtm2)</code></pre>
+</div>
+<div id="tegund-eigna" class="section level2">
+<h2>tegund eigna</h2>
+<pre class="r"><code>housing_data &lt;- housing_data %&gt;% mutate(teg_ein_s_i = case_when(
+    teg_eign %in% c(&quot;Einbýlishús&quot;, &quot;Parhús&quot;, &quot;Raðhús&quot;) ~ &quot;Sérbýli&quot;,
+    teg_eign %in% c(&quot;Íbúðareign&quot;) ~ &quot;Íbúð&quot;
+))</code></pre>
+</div>
+<div id="hverfi" class="section level2">
+<h2>hverfi</h2>
+<p>skiptum nú hverfakóðunum út fyrir nöfn þeirra á skiljanlegu máli, það sem kóðinn gerir er að skipta hverjum</p>
+<pre class="r"><code>housing_data &lt;- housing_data %&gt;% transmute(housing_data,
+    matssvaedi = case_when(
+        matssvaedi == 8 ~ &quot;Hagar / Melar&quot;,
+        matssvaedi == 25 ~ &quot;Bakkar&quot;,
+        matssvaedi == 320 ~ &quot;Kópavogur Au.&quot;
+    )
+)</code></pre>
+</div>
+</div>
 
 
 
