@@ -130,25 +130,27 @@ ggplot(housing_data, aes(x = kaupverd, y = birtm2, color = teg_ein_s_i)) +
 
 ## fjöldi sérbýla og íbúða í hverfum
 ```{r}
-table(housing_data$matssvaedi, housing_data$teg_ein_s_i)
+knitr::kable(table(housing_data$matssvaedi, housing_data$teg_ein_s_i))
 ```
 
 ## hlutfall sérbýla og íbúða í hverfum
 ```{r}
-round(
-    prop.table(
-        table(
-            housing_data$matssvaedi,
-            housing_data$teg_ein_s_i
+knitr::kable(
+    round(
+        prop.table(
+            table(
+                housing_data$matssvaedi,
+                housing_data$teg_ein_s_i
+            ),
+            1
         ),
-        1
-    ),
-    3
+        3
+    )
 )
 ```
 
 ```{r}
-housing_data %>%
+knitr::kable(housing_data %>%
     group_by(hverfi = matssvaedi, "tegund eigna" = teg_ein_s_i) %>% # our group
 
     summarise( # summarise operation by group
@@ -156,5 +158,18 @@ housing_data %>%
         staðalfrávik = sd(fermetraverd),
         miðgildi = median(fermetraverd),
         fjöldi = n()
-    )
+    ))
 ```
+
+# Hluti 4. - Líkindafræði
+
+líkur á að tvær eignir af þremur eignum séu einbýlishús, þar sem 20% eigna eru einbýlishús, $`r dbinom(2, 3, 0.2)`$ 
+en líkur á að færri en tvær eignir af þremur völdum séu einbýlishús eru $`r round(pbinom(1,3,0.2),3)`$
+
+
+gerum nú ráð fyrir að stærð einbýlishúsa í hverfinu fylgi normaldreifingu með meðaltal 170 fm og staðalfrávik 20 fm. 
+þá eru $`r round(1-pnorm(190,170,20),3)`$ líkur á að eign valin af handahófi sé stærri en $190m^2$
+
+
+Jonni ætlar að byggja einbýlishús í hverfinu og vill endilega að það verði í hópi 10% stærstu einbýlishúsanna í hverfinu. 
+húsið verður þá að vera $`r round(qnorm(0.9,170,20),3)` m^2$
