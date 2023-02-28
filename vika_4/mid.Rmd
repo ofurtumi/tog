@@ -1,0 +1,73 @@
+---
+title: "miðvikudagsæfing 4"
+author: "Þorvaldur Tumi Baldursson (ttb3@hi.is)"
+date: "2023-02-01"
+output: 
+    rmdformats::downcute:
+        downcute_theme: "chaos"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 9999)
+library(rmdformats)
+library(tidyverse)
+```
+
+## liðir 1 og 2, lesum inn gögn
+```{r}
+link <- "https://ahj.hi.is/handahofskenndar_spurningar_um_lifid.csv"
+
+ttb <- read.table(
+    link,
+    header = TRUE,
+    sep = ";",
+    dec = ",",
+    na.strings = "",
+)
+
+set.seed(800815)
+urtak <- sample_n(ttb, 200)
+```
+
+## liður 3, reiknum p hatt :)
+```{r}
+skipting <- table(urtak$oktoberfest)
+phatt <- 113 / 87
+h3 <- binom.test(skipting)
+h3
+```
+
+Geymum efra og neðra mark sem breytur:
+```{r}
+efr <- round(h3$conf.int[2], 3)
+ned <- round(h3$conf.int[1], 3)
+```
+Neðra markið er `r ned`
+
+Öryggisbilið er því:
+$$`r ned` < p < `r efr`$$
+
+## liður 4, könnum dót
+
+```{r}
+h4 <- prop.test(skipting)
+h4
+```
+Tilgáturnar okkar eru:
+$$H_0: p = 0.5\\H_1: p \neq 0.5$$  
+Gildið á prófstærðinni er `r h4$statistic` og p-gildið er því `r round(h4$p.value, 3)`
+
+P-gildið er stærra en $\alpha = 0.05$ og því getum við ekki hafnað $H_0$
+
+## hluti 5. 
+```{r}
+h5 <- chisq.test(table(urtak$hljodfaeri, urtak$feministi), correct = FALSE)
+h5
+
+h5$p.value
+h5
+```
+Tilgátur:
+$$H_0: p = 0.5\\H_1:p\neq 0.5$$
+GIldið á P er lægra en 0.05 þannig við getum gert ráð fyrir því að hljóðfæraleikarar séu líklegri til að vera femínistar en ekki

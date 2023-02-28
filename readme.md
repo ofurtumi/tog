@@ -111,3 +111,35 @@ val <- qnorm(0.6,11,1.2)
 
 9:      -5/3 = 0.0485
 11.5:   5/12 = 0.6591
+
+## dreifni lýsistærða
+
+Ef slembistærðirnar $X$ og $Y$ eru óháðar þar sem dreifni $X$ er $3$ og dreini $Y$ er $1$, hver er þá dreifni lýsistærðarinnar $X +Y$?  
+fyrir óháðar slembistærðir gildir að 
+$Var(X+Y) = Var(X) + Var(Y)$
+
+## alpha líkur
+Sigrún framkvæmdi tilgátupróf fyrir meðaltal þýðis og fékk út p-gildið 
+$0.10$. Sigrún ætlar að nota 
+$\alpha = 0.05$. Hvað er það sem alpha þýðir hérna?  
+$\alpha$ eru **líkurnar á að hafna núlltilgátu sem er í raun sönn**. Í þessu dæmi vitum við ekki hvort núlltilgátan sé sönn þannig getum ekki sagt mikið með þessar upplýsingar.
+
+## prófstærð útfrá óháðum þýðum
+við erum með tvö óháð þýði með óþekkta dreifni. 
+Bæði úrtök hafa stærð af $150$, fyrra úrtakið hefur meðaltal $21$ og staðalfrávik $1.1$ 
+en seinna úrtakið hefur meðaltal $20.5$ og staðalfrávik $1.5$. 
+Hvert er **gildið á prófstærðinni** ef kanna á tilgátuna að meðaltölin séu misjöfn.  
+
+til að finna prófastærðina má nota t- eða z-próf og höfum við breyturnar
+| breyta | gildi  |
+| ------ | ------ |
+| $x_1$  | $21$   |
+| $x_2$  | $20.5$ |
+| $\mu$  | $0$    |
+| $s_1$  | $1.1$  |
+| $s_2$  | $1.5$  |
+| $n_1$  | $150$  |
+| $n_2$  | $150$  |
+
+þá getum við bombað í þessa big ass formúlu:
+$$z = \frac{x_1-x_2-\mu}{\sqrt{\frac{s^2_1}{n_1}+\frac{s^2_2}{n_2}}} = \frac{21 - 20.5 - 0}{\sqrt{\frac{1.1^2}{150} + \frac{1.5^2}{150}}} = 3.29$$

@@ -2,12 +2,15 @@
 title: "Fyrra R verkefni"
 author: "Þorvaldur Tumi Baldursson (ttb3@hi.is)"
 date: "2023-02-01"
-output: html_document
+output: 
+    rmdformats::downcute:
+        downcute_theme: "chaos"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 options(scipen = 9999)
+library(tidyverse)
 library(dplyr)
 ```
 
@@ -16,18 +19,18 @@ library(dplyr)
 ## byrjum á að lesa inn gögnin:
 ```{r}
 housing_data <- read.table(
-    "https://notendur.hi.is/~ahj/husnaedisverd_2017_21.csv",
+    "https://ahj.hi.is/husnaedisverd_2017_21.csv",
     sep = ";",
     header = TRUE,
     stringsAsFactors = TRUE,
 )
 ```
 ## veljum síðan þrjú hverfi
-- mela / haga
-- breiðholt
-- austur kópavog
+- Fossvogur
+- Breiðholt
+- Austur Kópavog
 ```{r}
-hverfi <- c(8, 25, 320)
+hverfi <- c(280, 25, 320)
 housing_data <- dplyr::filter(housing_data, matssvaedi %in% hverfi)
 ```
 
@@ -37,11 +40,12 @@ print(str(housing_data))
 ```
 týpur breytanna lýta út fyrir að vera réttar
 
-## búum til fermetra breytu
+## fermetraverd
+búum til nýja breytu í töfluna þar sem við deilum kaupverðinu með stærð til að fá verð á fermetra
 ```{r}
 housing_data <- housing_data %>% mutate(fermetraverd = kaupverd / birtm2)
 ```
-
+´
 ## tegund eigna
 ```{r}
 housing_data <- housing_data %>% mutate(teg_ein_s_i = case_when(
@@ -56,9 +60,101 @@ skiptum nú hverfakóðunum út fyrir nöfn þeirra á skiljanlegu máli,
 ```{r}
 housing_data <- housing_data %>% transmute(housing_data,
     matssvaedi = case_when(
-        matssvaedi == 8 ~ "Hagar / Melar",
+        matssvaedi == 280 ~ "Fossvogur",
         matssvaedi == 25 ~ "Bakkar",
         matssvaedi == 320 ~ "Kópavogur Au."
     )
 )
+```
+
+
+# Hluti 2 - Myndræn framsetning
+
+## myndir af verði og stærð
+
+```{r}
+ggplot(housing_data, aes(kaupverd)) +
+    geom_histogram(
+        bins = 50,
+        col = "green",
+    ) +
+    ggtitle("Dreifing á kaupverði eigna") +
+    xlab("Kaupverð") +
+    ylab("Fjöldi eigna á verðbili")
+
+ggplot(housing_data, aes(birtm2)) +
+    geom_histogram(
+        bins = 50,
+        col = "purple",
+    ) +
+    ggtitle("Dreifing á stærð eigna") +
+    xlab("Stærð eigna í fermetrum") +
+    ylab("Fjöldi eigna á stærðarbili")
+```
+
+## mynd af skiptingu innan hverfa
+
+```{r}
+
+ggplot(housing_data, aes(matssvaedi, fill = teg_ein_s_i)) +
+    geom_bar(position = "dodge") +
+    ggtitle("Fjöldi og týpa eigna eftir hverfum") +
+    xlab("Hverfi") +
+    ylab("Fjöldi")
+```
+
+## mynd af fermetraverði eftir tegund eigna
+
+```{r}
+ggplot(housing_data, aes(fermetraverd, fill = teg_ein_s_i)) +
+    geom_histogram(
+        bins = 50,
+        col = "black",
+    ) +
+    ggtitle("Fermetraverð eftir tegund eigna") +
+    xlab("Verð") +
+    ylab("Fjöldi")
+```
+
+## mynd 
+
+```{r}
+ggplot(housing_data, aes(x = kaupverd, y = birtm2, color = teg_ein_s_i)) +
+    geom_point() +
+    facet_grid(~matssvaedi) +
+    xlab("kaupverð") +
+    ylab("stærð")
+```
+
+# Hluti 3. - Töflur
+
+## fjöldi sérbýla og íbúða í hverfum
+```{r}
+table(housing_data$matssvaedi, housing_data$teg_ein_s_i)
+```
+
+## hlutfall sérbýla og íbúða í hverfum
+```{r}
+round(
+    prop.table(
+        table(
+            housing_data$matssvaedi,
+            housing_data$teg_ein_s_i
+        ),
+        1
+    ),
+    3
+)
+```
+
+```{r}
+housing_data %>%
+    group_by(hverfi = matssvaedi, "tegund eigna" = teg_ein_s_i) %>% # our group
+
+    summarise( # summarise operation by group
+        meðaltal = mean(fermetraverd),
+        staðalfrávik = sd(fermetraverd),
+        miðgildi = median(fermetraverd),
+        fjöldi = n()
+    )
 ```
