@@ -1,0 +1,105 @@
+---
+title: "Fyrra R verkefni"
+author: "Þorvaldur Tumi Baldursson (ttb3@hi.is)"
+date: "2023-02-01"
+output: 
+    rmdformats::downcute:
+        downcute_theme: "chaos"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 9999)
+library(tidyverse)
+library(dplyr)
+```
+
+# Hluti 1 - Gagnameðhöndlun
+
+## byrjum á að lesa inn gögnin:
+```{r}
+hst <- read.table(
+  "https://ahj.hi.is/husnaedisverd_2017_21.csv",
+  sep = ";",
+  header = TRUE,
+  stringsAsFactors = TRUE,
+)
+```
+## veljum síðan þrjú hverfi
+- Fossvogur
+- Breiðholt
+- Austur Kópavog
+```{r}
+hverfi <- c(280, 25, 320)
+hst <- dplyr::filter(hst, matssvaedi %in% hverfi)
+```
+
+## athugum gerð breyta
+```{r}
+print(str(hst))
+```
+týpur breytanna lýta út fyrir að vera réttar
+
+## fermetraverd
+búum til nýja breytu í töfluna þar sem við deilum kaupverðinu með stærð til að fá verð á fermetra
+```{r}
+hst <- hst %>% mutate(fermetraverd = kaupverd / birtm2)
+```
+´
+## tegund eigna
+```{r}
+hst <- hst %>% mutate(teg_eign_s_i = case_when(
+  teg_eign %in% c("Einbýlishús", "Parhús", "Raðhús") ~ "Sérbýli",
+  teg_eign %in% c("Íbúðareign") ~ "Íbúð"
+))
+```
+
+## hverfi
+skiptum nú hverfakóðunum út fyrir nöfn þeirra á skiljanlegu máli, 
+það sem kóðinn gerir er að skipta hverjum 
+```{r}
+hst <- hst %>% transmute(hst,
+  matssvaedi = case_when(
+    matssvaedi == 280 ~ "Fossvogur",
+    matssvaedi == 25 ~ "Bakkar",
+    matssvaedi == 320 ~ "Kópavogur Au."
+  )
+)
+```
+## slembiúrtak
+```{R}
+set.seed(8)
+urtak <- sample_n(hst, 400)
+```
+
+# Hluti 2 - Töflur og tilgátur
+
+## fjöldi eftir hverfum
+```{R}
+h_table <- round(
+  prop.table(
+    table(
+      urtak$matssvaedi,
+      urtak$teg_eign_s_i
+    ),
+    1
+  ),
+  3
+)
+
+knitr::kable(
+  h_table
+)
+```
+
+## hlutfall eigna eftir hverfum
+```{R}
+knitr::kable(
+  round(proportions(h_table), 3)
+)
+```
+
+## tilgátupróf 
+```{R}
+t.test(table(urtak$matssvaedi, urtak$teg_eign_s_i))
+```

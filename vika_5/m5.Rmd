@@ -1,0 +1,68 @@
+---
+title: "miðvikudagsæfing 5"
+author: "Þorvaldur Tumi Baldursson (ttb3@hi.is)"
+date: "2023-02-01"
+output: 
+    rmdformats::downcute:
+        downcute_theme: "chaos"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 9999)
+library(rmdformats)
+library(tidyverse)
+```
+
+# liður 1
+```{R}
+link <- "https://ahj.hi.is/handahofskenndar_spurningar_um_lifid.csv"
+
+ttb <- read.table(
+    link,
+    header = TRUE,
+    sep = ";",
+    dec = ",",
+    na.strings = "",
+)
+```
+
+# liður 2
+```{R}
+urtak <- sample_n(ttb, 200)
+```
+
+# liður 3
+```{R}
+nidurstada <- t.test(urtak$ferdatimi)
+nedra_mark <- round(nidurstada$conf.int[1], 3)
+efra_mark <- round(nidurstada$conf.int[2], 3)
+```
+
+Við höfum öryggisbilið `r nedra_mark` < $\mu$ < `r efra_mark`
+
+# liður 4
+núlltilgátan okkar væri:  
+$$tilgáta = \begin{cases}\mu_1 - \mu_2 = 0 & \text{núlltilgáta} \\ \mu_1 - \mu_2 \neq 0 & \text{gagntilgáta} \end{cases}$$
+
+```{R}
+matur_ferdir <- t.test(table(urtak$ferdatimi, urtak$morgunmat))
+```
+
+prófstærð: `r round(matur_ferdir$statistic, 3)`  
+p-gildi: `r matur_ferdir$p.value`  
+p-gildið er pínulítið, miklu minna en $\alpha$, þannig við getum hafnað núlltilgátunni
+
+# liður 5
+athugum hvort hvort fólk borði morgunmat tengist því að fólk spili á hljóðfæri  
+núlltilgátan okkar væri: 
+$$tilgáta = \begin{cases}\mu_1 - \mu_2 = 0 & \text{núlltilgáta} \\ \mu_1 - \mu_2 \neq 0 & \text{gagntilgáta} \end{cases}$$
+
+```{R}
+hljod_matur <- t.test(table(urtak$hljodfaeri, urtak$morgunmat))
+```
+
+prófstærð: `r round(hljod_matur$statistic, 3)`  
+p-gildi: `r hljod_matur$p.value`  
+p-gildið er pínulítið, miklu minna en $\alpha$, þannig við getum hafnað núlltilgátunni
+

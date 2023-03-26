@@ -143,3 +143,81 @@ til að finna prófastærðina má nota t- eða z-próf og höfum við breyturna
 
 þá getum við bombað í þessa big ass formúlu:
 $$z = \frac{x_1-x_2-\mu}{\sqrt{\frac{s^2_1}{n_1}+\frac{s^2_2}{n_2}}} = \frac{21 - 20.5 - 0}{\sqrt{\frac{1.1^2}{150} + \frac{1.5^2}{150}}} = 3.29$$
+
+## prófastærð útfrá tveimur óháðum þýðum
+
+Tökum sitthvort úrtakið úr tveimur óháðum þýðum þar sem dreifni þýðanna er óþekkt. Úrtökin hafa bæði stærð 150, fyrra úrtak hefur meðaltal 21 og staðalfrávik 1.1, seinna hefur meðaltal 20.5 og staðalfrávik 1.5  
+hvert er gildið á prófstærðinni ef kanna á tilgátuna að meðaltölin séu misjöfn
+- bæði úrtökin hafa stærð $n_1 = 150,  n_2 = 150$
+- fyrra úrtakið hefur 
+  - meðaltal: $\overline{x}_1 = 21$
+  - staðalfrávik: $s_1 = 1.1$ 
+- seinna úrtakið hefur 
+  - meðaltal: $\overline{x}_2 = 20.5$
+  - staðalfrávik: $s_2 = 1.5$ 
+
+**ath!  staðalfrávik eru gefin, en í formúlunni til að finna svar á að nota dreifni sem er staðalfrávik^2**
+
+$$z = \frac{\overline{x}_1-\overline{x}_2-\delta}{\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}} = \frac{21-20.5-0}{\sqrt{\frac{1.1^2}{150}+\frac{1.5^2}{150}}} = 3.29$$
+
+## prófstærð útfrá n pöruðum mælingum
+
+við höfum eftirfarandi gögn um einstaklinga fyrir og eftir þau voru látin labba upp 100 tröppur:  
+
+| einstaklingur | bpm fyrir | bpm eftir | mismunur |
+| ------------- | --------- | --------- | -------- |
+| 1             | 60        | 70        | 10       |
+| 2             | 55        | 61        | 6        |
+| 3             | 62        | 88        | 26       |
+| 4             | 63        | 72        | 9        |
+| 5             | 59        | 80        | 21       |
+
+það er skítlöng formúla til að reikna þetta drasl, notum frekar **R**  
+
+ef við getum gert ráð fyrir því að gögn fylgi normaldreifingu þá bætum við aftast í fallið `paired=T` *(held ég)*
+
+```r
+# fyrir gögn sem er ekki víst að fylgi normaldreifingu
+t.test(c(60,55,62,63,59), c(70,61,88,72,80))
+
+# fyrir gögn sem fylgja normaldreifingu
+t.test(c(60,55,62,63,59), c(70,61,88,72,80), paired = T)
+```
+
+við erum að leita að úrtakinu sem heitir `t` og af ehv ástæðum er það mínustala??
+
+## efra og neðra öryggisbil
+til að finna efra og neðra öryggisbil notum við eftirfarandi formúlur
+
+$+$ tilheyrir efra öryggisbili og 
+$-$ tilheyrir neðra öryggisbili
+
+notum þessa ef gögn uppfylla skilyrði fyrir normalnálgun 
+$$\hat{p}\pm z_{1-\alpha/2}\cdot \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$$
+
+þar sem $\hat{p} = \frac{x}{n}$
+
+# línulegt aðhvarf
+
+Atli vill kanna hvort það śe í raun fylgni milli vettlingasölu og hitastigs. Hann framkvæmir tvíhliða tilgátupróf og prófstærðin í tilgátuprófinu hans er -2.07. Hvaða ályktun dregur hann.
+hér er 0-tilgáta að p = 0 og gagntilgáta p != 0
+
+$t_{1-\frac{a}{2}(n-2)} = t_{0.975,(5)}=qt(-2.07,0.975,5)$
+
+# aðhvarfsgreining - stiklað á stóru
+
+## nöfn á breytum
+í línulegri aðhvarfsgreiningu kallast breytan sem fylgir Y-ásnum **svarbreyta** og sú sem stjórnar svarbreytunni og fylgir X-ásnum kallast **skýribreyta**
+
+## fylgni út frá gögnum
+til að fá fylgni út frá R-gögnum, skal taka rótina af `Multiple R-squared` og athuga hvort gögnin séu hækkandi eða lækkandi og setja mínus sem samsvarar því 
+
+## response töflur
+ef tafla er gefin með eftirfarandi breytum:
+- Df
+- Sum Sq
+- Mean Sq
+
+og ehv nokkrum fleirum má finna **Df** með því að deila **Sum Sq** með **Mean Sq** í sömu línu þ.e. 
+$$Df=\frac{\sigma^2}{\mu^2}$$
+og þetta má umrita til að finna annaðhvort $\mu^2$ eða $\sigma^2$

@@ -1,0 +1,95 @@
+<h1 id="hluti-1---gagnameðhöndlun">Hluti 1 - Gagnameðhöndlun</h1>
+<h2 id="byrjum-á-að-lesa-inn-gögnin">byrjum á að lesa inn gögnin:</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>hst &lt;-<span class="st"> </span><span class="kw">read.table</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="st">&quot;https://ahj.hi.is/husnaedisverd_2017_21.csv&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="dt">sep =</span> <span class="st">&quot;;&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="dt">header =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">stringsAsFactors =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>)</span></code></pre></div>
+<h2 id="veljum-síðan-þrjú-hverfi">veljum síðan þrjú hverfi</h2>
+<ul>
+<li>Fossvogur</li>
+<li>Breiðholt</li>
+<li>Austur Kópavog</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>hverfi &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">280</span>, <span class="dv">25</span>, <span class="dv">320</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>hst &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(hst, matssvaedi <span class="op">%in%</span><span class="st"> </span>hverfi)</span></code></pre></div>
+<h2 id="athugum-gerð-breyta">athugum gerð breyta</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">print</span>(<span class="kw">str</span>(hst))</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    2130 obs. of  5 variables:
+##  $ kaupverd  : int  18000 13500 67000 51500 52800 63800 18000 50000 32000 36000 ...
+##  $ teg_eign  : Factor w/ 4 levels &quot;Einbýlishús&quot;,..: 2 2 1 2 4 1 2 1 2 1 ...
+##  $ byggar    : int  1973 1971 1970 1995 1969 1924 1989 1962 2007 1955 ...
+##  $ birtm2    : num  89.5 49.9 197.1 216.4 220.7 ...
+##  $ matssvaedi: int  320 320 280 320 280 25 25 320 320 320 ...
+## NULL</code></pre>
+<p>týpur breytanna lýta út fyrir að vera réttar</p>
+<h2 id="fermetraverd">fermetraverd</h2>
+<p>búum til nýja breytu í töfluna þar sem við deilum kaupverðinu með stærð til að fá verð á fermetra</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>hst &lt;-<span class="st"> </span>hst <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">fermetraverd =</span> kaupverd <span class="op">/</span><span class="st"> </span>birtm2)</span></code></pre></div>
+<p>´ ## tegund eigna</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>hst &lt;-<span class="st"> </span>hst <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">teg_eign_s_i =</span> <span class="kw">case_when</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>  teg_eign <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Einbýlishús&quot;</span>, <span class="st">&quot;Parhús&quot;</span>, <span class="st">&quot;Raðhús&quot;</span>) <span class="op">~</span><span class="st"> &quot;Sérbýli&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>  teg_eign <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Íbúðareign&quot;</span>) <span class="op">~</span><span class="st"> &quot;Íbúð&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>))</span></code></pre></div>
+<h2 id="hverfi">hverfi</h2>
+<p>skiptum nú hverfakóðunum út fyrir nöfn þeirra á skiljanlegu máli, það sem kóðinn gerir er að skipta hverjum</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>hst &lt;-<span class="st"> </span>hst <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">transmute</span>(hst,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>  <span class="dt">matssvaedi =</span> <span class="kw">case_when</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    matssvaedi <span class="op">==</span><span class="st"> </span><span class="dv">280</span> <span class="op">~</span><span class="st"> &quot;Fossvogur&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>    matssvaedi <span class="op">==</span><span class="st"> </span><span class="dv">25</span> <span class="op">~</span><span class="st"> &quot;Bakkar&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>    matssvaedi <span class="op">==</span><span class="st"> </span><span class="dv">320</span> <span class="op">~</span><span class="st"> &quot;Kópavogur Au.&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>  )</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>)</span></code></pre></div>
+<h2 id="slembiúrtak">slembiúrtak</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">set.seed</span>(<span class="dv">8</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>urtak &lt;-<span class="st"> </span><span class="kw">sample_n</span>(hst, <span class="dv">400</span>)</span></code></pre></div>
+<h1 id="hluti-2---töflur-og-tilgátur">Hluti 2 - Töflur og tilgátur</h1>
+<h2 id="fjöldi-eftir-hverfum">fjöldi eftir hverfum</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>h_table &lt;-<span class="st"> </span><span class="kw">round</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>  <span class="kw">prop.table</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>    <span class="kw">table</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>      urtak<span class="op">$</span>matssvaedi,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>      urtak<span class="op">$</span>teg_eign_s_i</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>    ),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>    <span class="dv">1</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>  ),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a>  <span class="dv">3</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a>knitr<span class="op">::</span><span class="kw">kable</span>(</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a>  h_table</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>)</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Íbúð</th>
+<th style="text-align: right;">Sérbýli</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Bakkar</td>
+<td style="text-align: right;">0.883</td>
+<td style="text-align: right;">0.117</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Fossvogur</td>
+<td style="text-align: right;">0.667</td>
+<td style="text-align: right;">0.333</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kópavogur Au.</td>
+<td style="text-align: right;">0.839</td>
+<td style="text-align: right;">0.161</td>
+</tr>
+</tbody>
+</table>
+<h2 id="hlutfall-eigna-eftir-hverfum">hlutfall eigna eftir hverfum</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">proportions</span>(h_table)</span></code></pre></div>
+<pre><code>##                
+##                       Íbúð    Sérbýli
+##   Bakkar        0.29433333 0.03900000
+##   Fossvogur     0.22233333 0.11100000
+##   Kópavogur Au. 0.27966667 0.05366667</code></pre>
